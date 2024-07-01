@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllRiskSolutions-Desafio", "AllRiskSolutions-Desafio.csproj", "{FDD25447-59CF-4A7F-BD15-4AD17608F98B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{73BBDDDA-A652-41B6-ADBF-BFDFD281FA2B}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FDD25447-59CF-4A7F-BD15-4AD17608F98B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDD25447-59CF-4A7F-BD15-4AD17608F98B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDD25447-59CF-4A7F-BD15-4AD17608F98B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDD25447-59CF-4A7F-BD15-4AD17608F98B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

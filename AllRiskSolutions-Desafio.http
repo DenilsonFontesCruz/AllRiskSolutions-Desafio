@@ -1,0 +1,6 @@
+@AllRiskSolutions_Desafio_HostAddress = http://localhost:5107
+
+GET {{AllRiskSolutions_Desafio_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
