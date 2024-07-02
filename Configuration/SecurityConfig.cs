@@ -3,17 +3,15 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AllRiskSolutions_Desafio.Configuration;
 
-public static class SecurityConfig
+public class SecurityConfig(IServiceCollection services, VariableProvider variableProvider)
 {
-    public static void AddAuthenticationService(this IServiceCollection services)
+    public void AddAuthenticationService()
     {
-        VariableProvider variableProvider =
-            services.BuildServiceProvider().GetService<VariableProvider>()!;
-
         var key = Encoding.ASCII.GetBytes(variableProvider.GetJwtSecret());
 
         var authenticationBuilder = services.AddAuthentication(options =>
@@ -36,12 +34,18 @@ public static class SecurityConfig
         });
     }
 
-    public static void AddAuthorizationService(this IServiceCollection services)
+    public void AddAuthorizationService()
     {
         services.AddAuthorization(options =>
         {
             options.DefaultPolicy = new AuthorizationPolicyBuilder()
                 .RequireClaim(ClaimTypes.Role, "User").Build();
+        });
+
+        services.AddControllers(options =>
+        {
+            var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+            options.Filters.Add(new AuthorizeFilter(policy));
         });
     }
 }

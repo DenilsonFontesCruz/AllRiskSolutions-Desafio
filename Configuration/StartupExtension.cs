@@ -8,41 +8,25 @@ using AllRiskSolutions_Desafio.Infrastructure.Repositories;
 using AllRiskSolutions_Desafio.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.OpenApi.Models;
 
 namespace AllRiskSolutions_Desafio.Configuration;
 
 public static class StartupExtension
 {
-    public static void AddStartupComponents(this IServiceCollection services)
+    public static void AddStartup(this WebApplicationBuilder builder)
     {
-        services.AddVariableProvider();
-        services.AddLogging();
-        services.AddCacheManager();
-        services.AddExternalServices();
-        services.AddRepositories();
-        services.AddServices();
-        services.AddAuthenticationService();
-        services
-            .AddTransient<IAuthorizationMiddlewareResultHandler,
-                AuthorizationMiddlewareResultHandler>();
-        services.AddAuthorizationService();
-        services.AddCors();
-
-        services.AddControllers(options =>
-        {
-            var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-            options.Filters.Add(new AuthorizeFilter(policy));
-        });
+        new Startup(builder).Start();
     }
 
-    private static void AddRepositories(this IServiceCollection services)
+    public static void AddRepositories(this IServiceCollection services)
     {
         services.AddDbContext<AppDbContext>();
         services.AddScoped<IUserRepository, UserRepositorySql>();
         services.AddScoped<ICityRepository, CityRepositorySql>();
     }
 
-    private static void AddServices(this IServiceCollection services)
+    public static void AddServices(this IServiceCollection services)
     {
         services.AddScoped<UserService>();
         services.AddScoped<AuthService>();
@@ -50,7 +34,7 @@ public static class StartupExtension
         services.AddScoped<ForecastService>();
     }
 
-    private static void AddExternalServices(this IServiceCollection services)
+    public static void AddExternalServices(this IServiceCollection services)
     {
         services.AddScoped<HttpClient>();
         services.AddScoped<JwtSecurityTokenHandler>();
@@ -59,18 +43,62 @@ public static class StartupExtension
         services.AddScoped<IWeatherApi, WeatherApi>();
     }
 
-    private static void AddVariableProvider(this IServiceCollection services)
+    public static VariableProvider AddVariableProvider(this IServiceCollection services)
     {
         services.AddSingleton<VariableProvider>();
+        return services.BuildServiceProvider().GetService<VariableProvider>()!;
     }
 
-    private static void AddCacheManager(this IServiceCollection services)
+    public static void AddCacheManager(this IServiceCollection services)
     {
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = services.BuildServiceProvider()
                 .GetRequiredService<VariableProvider>().GetCacheConnectionString();
             options.InstanceName = "AllRiskSolutions_Desafio";
+        });
+    }
+
+    public static void AddMiddlewares(this IServiceCollection services)
+    {
+        services.AddTransient<AuthorizationMiddlewareResultHandler>();
+    }
+
+    public static void AddSwaggerGen(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1",
+                new OpenApiInfo()
+                    { Title = "AllRiskSolutions-Desafio-Weather-Api", Version = "v1" });
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                        Scheme = "oauth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header,
+                    },
+                    new List<string>()
+                }
+            });
         });
     }
 }
