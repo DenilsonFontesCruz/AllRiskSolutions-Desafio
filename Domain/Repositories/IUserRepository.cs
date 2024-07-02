@@ -11,4 +11,6 @@ public interface IUserRepository : IRepository<User>
     public Task<Result<User>> FindByUsernameAsync(string username);
 
     public User? Update(User model);
+
+    public Task<Result<User>> FindByIdWithCitiesAsync(Guid id);
 }

@@ -18,9 +18,7 @@ public class AuthController(AuthService authService, ILogger<UserController> log
     {
         try
         {
-            var result = await authService.AuthenticateAsync(request.Username, request.Password);
-
-            return result;
+            return await authService.AuthenticateAsync(request.Username, request.Password);
         }
         catch (Exception e)
         {

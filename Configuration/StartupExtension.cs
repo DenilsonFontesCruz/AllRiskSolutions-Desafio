@@ -1,4 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
+using AllRiskSolutions_Desafio.Application.Api;
+using AllRiskSolutions_Desafio.Domain.ApiServices;
 using AllRiskSolutions_Desafio.Domain.ExternalServices;
 using AllRiskSolutions_Desafio.Domain.Repositories;
 using AllRiskSolutions_Desafio.Domain.Services;
@@ -16,6 +18,7 @@ public static class StartupExtension
         services.AddVariableProvider();
         services.AddLogging();
         services.AddCacheManager();
+        services.AddExternalServices();
         services.AddRepositories();
         services.AddServices();
         services.AddAuthenticationService();
@@ -41,12 +44,19 @@ public static class StartupExtension
 
     private static void AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IEncryptor, EncryptorBcrypt>();
-        services.AddScoped<ICacheManager, CacheManagerRedis>();
-        services.AddScoped<JwtSecurityTokenHandler>();
         services.AddScoped<UserService>();
         services.AddScoped<AuthService>();
         services.AddScoped<CityService>();
+        services.AddScoped<ForecastService>();
+    }
+
+    private static void AddExternalServices(this IServiceCollection services)
+    {
+        services.AddScoped<HttpClient>();
+        services.AddScoped<JwtSecurityTokenHandler>();
+        services.AddScoped<IEncryptor, EncryptorBcrypt>();
+        services.AddScoped<ICacheManager, CacheManagerRedis>();
+        services.AddScoped<IWeatherApi, WeatherApi>();
     }
 
     private static void AddVariableProvider(this IServiceCollection services)

@@ -11,6 +11,12 @@ public class CityService(ICityRepository cityRepository, ILogger<CityService> lo
     {
         logger.LogInformation("Registering city");
 
+        if (name.Length > 80)
+        {
+            logger.LogInformation("City name too long");
+            return Result.Fail<City>("City name too long", "400");
+        }
+
         if (await cityRepository.ExistsByNameAsync(name))
         {
             logger.LogInformation($"City: {name} already exists");
@@ -29,6 +35,19 @@ public class CityService(ICityRepository cityRepository, ILogger<CityService> lo
     {
         logger.LogInformation("Finding city by name");
         var cityResult = await cityRepository.FindByNameAsync(name);
+
+        if (cityResult.IsFail)
+        {
+            return cityResult;
+        }
+
+        return cityResult.Value();
+    }
+
+    public async Task<Result<City>> GetById(Guid id)
+    {
+        logger.LogInformation("Finding city by id");
+        var cityResult = await cityRepository.FindByIdAsync(id);
 
         if (cityResult.IsFail)
         {

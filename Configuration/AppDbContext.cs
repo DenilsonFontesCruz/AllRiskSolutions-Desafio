@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AllRiskSolutions_Desafio.Configuration;
 
-public class AppDbContext : DbContext
+public class AppDbContext(IWebHostEnvironment env, VariableProvider variableProvider) : DbContext
 {
     public DbSet<User> Users { get; set; } = default!;
     public DbSet<City> Cities { get; set; } = default!;
@@ -17,6 +17,6 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("DataSource=app.db;Cache=Shared");
+        optionsBuilder.UseSqlServer(variableProvider.GetSqlDatabaseConnectionString());
     }
 }

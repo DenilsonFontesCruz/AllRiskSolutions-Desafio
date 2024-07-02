@@ -13,6 +13,12 @@ public class UserService(
     public async Task<Result<User>> RegisterUserAsync(string username, string password)
     {
         logger.LogInformation("Registering user");
+        if (username.Length > 40)
+        {
+            logger.LogInformation("Username too long");
+            return Result.Fail<User>("Username too long", "400");
+        }
+
         if (await userRepository.ExistsByUsernameAsync(username))
         {
             logger.LogInformation($"Username: {username} already in use");
@@ -57,7 +63,7 @@ public class UserService(
     public async Task<Result<User>> RemoveFavoriteCity(Guid userId, City city)
     {
         logger.LogInformation("Removing favorite city");
-        var userResult = await userRepository.FindByIdAsync(userId);
+        var userResult = await userRepository.FindByIdWithCitiesAsync(userId);
 
         if (userResult.IsFail)
         {
@@ -82,6 +88,19 @@ public class UserService(
     {
         logger.LogInformation("Getting user");
         var userResult = await userRepository.FindByIdAsync(id);
+
+        if (userResult.IsFail)
+        {
+            return userResult;
+        }
+
+        return userResult;
+    }
+
+    public async Task<Result<User>> GetByIdWithCities(Guid id)
+    {
+        logger.LogInformation("Getting user with favorite cities");
+        var userResult = await userRepository.FindByIdWithCitiesAsync(id);
 
         if (userResult.IsFail)
         {

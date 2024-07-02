@@ -1,9 +1,6 @@
 namespace AllRiskSolutions_Desafio.Configuration;
 
-/// <summary>
-/// Get variables from appsettings.json
-/// </summary>
-/// <param name="configuration">IConfiguration</param>
+
 public class VariableProvider(IConfiguration configuration)
 {
     public string GetJwtSecret()
@@ -14,5 +11,15 @@ public class VariableProvider(IConfiguration configuration)
     public string GetCacheConnectionString()
     {
         return configuration["CacheConnectionString"] ?? "127.0.0.1:6379";
+    }
+
+    public string GetWeatherApiKey()
+    {
+        return configuration["WeatherApiKey"] ?? "ApiKey";
+    }
+
+    public string GetSqlDatabaseConnectionString()
+    {
+        return configuration["SqlDatabaseConnectionString"] ?? "DataSource=app.db;Cache=Shared";
     }
 }

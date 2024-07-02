@@ -42,7 +42,8 @@ public class UserController(
         try
         {
             var result =
-                UserViewModel.ToResult(await userService.GetById(Guid.Parse(User.Identity!.Name!)));
+                UserViewModel.ToResult(
+                    await userService.GetByIdWithCities(Guid.Parse(User.Identity!.Name!)));
 
             return result;
         }
@@ -84,6 +85,33 @@ public class UserController(
         catch (Exception e)
         {
             logger.LogError(e, "Error adding favorite city");
+            throw;
+        }
+    }
+
+    public record RemoveFavoriteCityRequest(Guid Id);
+
+    [HttpPost("remove-favorite-city")]
+    [Authorize]
+    public async Task<ActionResult<UserViewModel>> RemoveFavoriteCity(
+        [FromBody] RemoveFavoriteCityRequest request)
+    {
+        try
+        {
+            var cityResult = await cityService.GetById(request.Id);
+            if (cityResult.IsFail)
+            {
+                return Result.Fail<UserViewModel>(cityResult.Error);
+            }
+
+            var userResult = await userService.RemoveFavoriteCity(Guid.Parse(User.Identity!.Name!),
+                cityResult.Value());
+
+            return UserViewModel.ToResult(userResult);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error removing favorite city");
             throw;
         }
     }

@@ -61,6 +61,19 @@ public class UserRepositorySql(AppDbContext context, ILogger<UserRepositorySql> 
         return user.Entity;
     }
 
+    public async Task<Result<User>> FindByIdWithCitiesAsync(Guid id)
+    {
+        var user = await context.Users.Include("FavoriteCities")
+            .FirstOrDefaultAsync(x => x.Id == id);
+        if (user == null)
+        {
+            logger.LogInformation($"User not found, Id: {id.ToString()}");
+            return Result.Fail<User>("User not found", "404");
+        }
+
+        return user;
+    }
+
     public async Task<int> SaveAsync()
     {
         return await context.SaveChangesAsync();

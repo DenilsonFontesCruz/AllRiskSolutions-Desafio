@@ -18,9 +18,20 @@ public class City(Guid id, string name, double latitude, double longitude, strin
         : this(id, name, coords.Latitude, coords.Longitude, countryCode)
     {
     }
+
+    public Coords GetCoords()
+    {
+        return new Coords(Latitude, Longitude);
+    }
 }
 
-public record Coords(double Latitude, double Longitude);
+public record Coords(double Latitude, double Longitude)
+{
+    public bool IsEmpty()
+    {
+        return Latitude == 0 && Longitude == 0;
+    }
+}
 
 public record CityViewModel(Guid Id, string Name, Coords Coords, string CountryCode)
 {
