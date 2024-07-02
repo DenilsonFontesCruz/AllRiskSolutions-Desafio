@@ -12,7 +12,7 @@ public class ForecastService(IWeatherApi weatherApi, ILogger<ForecastService> lo
         return await weatherApi.GetCurrentWheater(coords);
     }
 
-    public async Task<Result<List<WeatherInfo>>> GetFiveDaysForecast(Coords coords)
+    public async Task<Result<List<SimpleWeatherInfo>>> GetFiveDaysForecast(Coords coords)
     {
         logger.LogInformation("Getting five days forecast");
         return await weatherApi.GetFiveDaysForecast(coords);

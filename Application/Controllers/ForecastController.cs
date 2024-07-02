@@ -42,7 +42,7 @@ public class ForecastController(
 
     [HttpGet("forecast-five-days")]
     [Authorize]
-    public async Task<ActionResult<List<WeatherInfo>>> GetFiveDaysForecast(
+    public async Task<ActionResult<List<SimpleWeatherInfo>>> GetFiveDaysForecast(
         [FromQuery] Coords? coords,
         string? cityId)
     {
@@ -52,7 +52,7 @@ public class ForecastController(
 
             if (cityCoordsResult.IsFail)
             {
-                return Result.Fail<List<WeatherInfo>>(cityCoordsResult.Error);
+                return Result.Fail<List<SimpleWeatherInfo>>(cityCoordsResult.Error);
             }
 
             var resultWeather = await forecastService.GetFiveDaysForecast(cityCoordsResult.Value());
@@ -68,12 +68,9 @@ public class ForecastController(
 
     private async Task<Result<Coords>> GetCityCoords(Coords? coords, string? cityId)
     {
-        if (cityId == null)
-        {
-            return Result.Fail<Coords>("City id must be provided", "400");
-        }
-
-        var cityResult = await cityService.GetById(Guid.Parse(cityId));
+        var cityResult = (cityId != null)
+            ? await cityService.GetById(Guid.Parse(cityId))
+            : Result.Fail<City>("City id must be provided", "400");
 
         if (cityResult.IsFail && coords!.IsEmpty())
         {

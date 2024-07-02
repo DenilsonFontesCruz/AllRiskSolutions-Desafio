@@ -7,8 +7,14 @@ public interface IWeatherApi
 {
     Task<Result<WeatherInfo>> GetCurrentWheater(Coords coords);
 
-    Task<Result<List<WeatherInfo>>> GetFiveDaysForecast(Coords coords);
+    Task<Result<List<SimpleWeatherInfo>>> GetFiveDaysForecast(Coords coords);
 }
+
+public record SimpleWeatherInfo(
+    DateTime DateTime,
+    Climate Climate,
+    double MaxTemperature,
+    double MinTemperature);
 
 public record WeatherInfo(
     DateTime DateTime,

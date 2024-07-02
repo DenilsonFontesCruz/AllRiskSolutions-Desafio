@@ -33,7 +33,7 @@ public class WeatherApi(
         return Result.Success<WeatherInfo>(content!);
     }
 
-    public async Task<Result<List<WeatherInfo>>> GetFiveDaysForecast(Coords coords)
+    public async Task<Result<List<SimpleWeatherInfo>>> GetFiveDaysForecast(Coords coords)
     {
         var result = await httpClient.GetAsync(
             $"https://api.openweathermap.org/data/2.5/forecast?lat={coords.Latitude}" +
@@ -53,7 +53,7 @@ public class WeatherApi(
             Result.Fail<WeatherInfo>("Error parsing data from OpenWeatherMap", "500");
         }
 
-        return Result.Success<List<WeatherInfo>>(content!);
+        return Result.Success<List<SimpleWeatherInfo>>(content!);
     }
 }
 
@@ -94,12 +94,33 @@ public record GetCurrentWheaterApiResponse(
         return new WeatherInfo(dateTime, climate, main.Temp, main.Feels_like, main.Temp_max,
             main.Temp_min, main.Pressure, main.Humidity);
     }
+
+    public static implicit operator SimpleWeatherInfo(GetCurrentWheaterApiResponse response)
+    {
+        var (weather, main, dt) = response;
+
+        var dateTime = DateTimeOffset.FromUnixTimeSeconds(dt).DateTime;
+
+        var climate = weather.First().Main switch
+        {
+            "Thunderstorm" => Climate.Thunderstorm,
+            "Drizzle" => Climate.Drizzle,
+            "Rain" => Climate.Rain,
+            "Snow" => Climate.Snow,
+            "Atmosphere" => Climate.Atmosphere,
+            "Clear" => Climate.Clear,
+            "Clouds" => Climate.Clouds,
+            _ => Climate.Clear
+        };
+
+        return new SimpleWeatherInfo(dateTime, climate, main.Temp_max, main.Temp_min);
+    }
 }
 
 public record GetCurrentForecastApiResponse(List<GetCurrentWheaterApiResponse> list)
 {
-    public static implicit operator List<WeatherInfo>(GetCurrentForecastApiResponse response)
+    public static implicit operator List<SimpleWeatherInfo>(GetCurrentForecastApiResponse response)
     {
-        return response.list.Select(r => (WeatherInfo)r).ToList();
+        return response.list.Select(r => (SimpleWeatherInfo)r).ToList();
     }
 }
