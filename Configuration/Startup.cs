@@ -12,7 +12,6 @@ public class Startup(WebApplicationBuilder builder)
         services.AddExternalServices();
         services.AddRepositories();
         services.AddServices();
-        services.AddCors();
         services.AddEndpointsApiExplorer();
         services.AddMiddlewares();
         services.AddSwaggerGen();
@@ -20,5 +19,6 @@ public class Startup(WebApplicationBuilder builder)
         var securityConfig = new SecurityConfig(services, variableProvider);
         securityConfig.AddAuthenticationService();
         securityConfig.AddAuthorizationService();
+        securityConfig.AddCors();
     }
 }

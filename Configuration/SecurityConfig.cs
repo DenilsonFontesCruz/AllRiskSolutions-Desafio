@@ -48,4 +48,17 @@ public class SecurityConfig(IServiceCollection services, VariableProvider variab
             options.Filters.Add(new AuthorizeFilter(policy));
         });
     }
+
+    public void AddCors()
+    {
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
+    }
 }
