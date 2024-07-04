@@ -16,7 +16,7 @@ public class ForecastController(
     : ControllerBase
 {
     [HttpGet("current")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<WeatherInfo>> GetCurrentWeather([FromQuery] Coords? coords,
         string? cityId)
     {
@@ -41,7 +41,7 @@ public class ForecastController(
     }
 
     [HttpGet("forecast-five-days")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<List<SimpleWeatherInfo>>> GetFiveDaysForecast(
         [FromQuery] Coords? coords,
         string? cityId)
@@ -68,8 +68,9 @@ public class ForecastController(
 
     private async Task<Result<Coords>> GetCityCoords(Coords? coords, string? cityId)
     {
-        var cityResult = (cityId != null)
-            ? await cityService.GetById(Guid.Parse(cityId))
+        Guid.TryParse(cityId, out var id);
+        var cityResult = (id != Guid.Empty)
+            ? await cityService.GetById(id)
             : Result.Fail<City>("City id must be provided", "400");
 
         if (cityResult.IsFail && coords!.IsEmpty())

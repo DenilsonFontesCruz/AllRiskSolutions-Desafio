@@ -13,10 +13,16 @@ public class UserService(
     public async Task<Result<User>> RegisterUserAsync(string username, string password)
     {
         logger.LogInformation("Registering user");
-        if (username.Length > 40)
+        if (username.Length is > 40 or < 3)
         {
-            logger.LogInformation("Username too long");
-            return Result.Fail<User>("Username too long", "400");
+            logger.LogInformation("Invalid username");
+            return Result.Fail<User>("Username must have between 3 and 40 characters.", "400");
+        }
+
+        if (password.Length is > 64 or < 8)
+        {
+            logger.LogInformation("Invalid Password");
+            return Result.Fail<User>("Password must have between 8 and 64 characters.", "400");
         }
 
         if (await userRepository.ExistsByUsernameAsync(username))
